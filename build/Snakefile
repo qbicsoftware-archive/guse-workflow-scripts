@@ -1,0 +1,72 @@
+import glob, os
+
+SRC = '../bin'
+
+def tared_guse_apps():
+    cwd = os.getcwd()
+    os.chdir(SRC)
+    ret = [os.path.splitext(file)[0] for file in glob.glob("*.sh")]
+    os.chdir(cwd)
+    return ret
+
+final_outputs = tared_guse_apps()
+print(final_outputs)
+rule all:
+    input: expand("{shell_file}.sh.app.tgz", shell_file=final_outputs)
+    log: "all.log"
+
+
+rule prepare_sh1:
+    input:'../bin/workflow.sh'
+    output: "workflow.sh"
+    log: "prepare_sh.log"
+    shell:
+        "cp {input} {output}"
+
+rule prepare_py1:
+    input: '../bin/workflow.py' 
+    output: "workflow.py"
+    log: "prepare_sh.log"
+    shell:
+        "cp {input} {output}"
+
+rule prepare_sh2:
+    input:'../bin/init.sh'
+    output: "init.sh"
+    log: "prepare_sh.log"
+    shell:
+        "cp {input} {output}"
+
+rule prepare_py2:
+    input: '../bin/init.py' 
+    output: "init.py"
+    log: "prepare_sh.log"
+    shell:
+        "cp {input} {output}"
+
+rule prepare_sh3:
+    input:'../bin/commit.sh'
+    output: "commit.sh"
+    log: "prepare_sh.log"
+    shell:
+        "cp {input} {output}"
+
+rule prepare_py3:
+    input: '../bin/commit.py' 
+    output: "commit.py"
+    log: "prepare_sh.log"
+    shell:
+        "cp {input} {output}"
+
+rule tar:
+    input: '{blub}.sh', '{blub}.py'
+    output:'{blub}.sh.app.tgz'
+    log: "tar.log"
+    shell:
+        "tar -zcvf {output} {input}"
+
+
+rule clean:
+    shell:
+        "rm -f *.tgz *.py *.sh"
+
