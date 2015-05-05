@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tool name="FileListParameterTest" version="2.0.0" docurl="http://ftp.mi.fu-berlin.de/OpenMS/release-documentation/html/TOPP_XTandemAdapter.html" category="Identification">
+	<description>test ctd for reading and writing File Parameters</description>
+	<manual>test ctd for reading and writing File Parameters</manual>
+	<executableName>FileListParameterTest</executableName>
+	<executablePath></executablePath>
+	<PARAMETERS version="1.6.2" xsi:noNamespaceSchemaLocation="http://open-ms.sourceforge.net/schemas/Param_1_6_2.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+		<NODE name="FileListParameterTest" description="test ctd for reading and writing File Parameters.">
+			<ITEM name="version" value="2.0.0" type="string" description="Version of the tool that generated this parameters file." advanced="true" required="false" />
+			<NODE name="1" description="Instance &apos;1&apos; section for &apos;FileListParameterTest&apos;">
+				<ITEMLIST name="input" type="input-file" description="mzml files on which to perform qualitiy control." supported_formats="*.mzml" advanced="false" required="true">
+                    <LISTITEM value="/lustre_cfc/qbic/qbic_projects/SGOX/mzml/20150114124851_20150112_CO_0520SiDG_QBIC_R02_QSGOX003AB.mzML"/>
+				</ITEMLIST>
+                <ITEM name="db" value="/lustre_cfc/qbic/WF_testing/inputFiles/uniprot-human.fasta" type="input-file" description="database to performa qualitiy control." advanced="false" required="true" supported_formats="*.fasta,*.fa" />
+			</NODE>
+		</NODE>
+	</PARAMETERS>
+</tool>

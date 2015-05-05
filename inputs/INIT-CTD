@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tool name="Init" version="2.0.0" docurl="http://ftp.mi.fu-berlin.de/OpenMS/release-documentation/html/TOPP_XTandemAdapter.html" category="Identification">
+	<description>initializes workspace and qproject for a snakemake workflow</description>
+	<manual>initializes workspace and qproject for a snakemake workflow</manual>
+	<executableName>init.py</executableName>
+	<executablePath></executablePath>
+	<PARAMETERS version="1.6.2" xsi:noNamespaceSchemaLocation="http://open-ms.sourceforge.net/schemas/Param_1_6_2.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+		<NODE name="Init" description="initializes workspace and qproject for a snakemake workflow">
+			<ITEM name="version" value="2.0.0" type="string" description="Version of the tool that generated this parameters file." advanced="true" required="false" />
+			<NODE name="1" description="Instance &apos;1&apos; section for &apos;FileListParameterTest&apos;">
+      <ITEM name="duration" value="5" type="int" description="duration in days for the workspace to allocate" required="true" advanced="true" />
+      <ITEM name="filesystem" value="cfc" type="string" description="on which file system should workspace be created" required="true" advanced="true" restrictions="cfc,hpc" />
+      <ITEM name="wfname" value="qcprot" type="string" description="snakemake workflow name as you can find it in the git repository." required="true" advanced="true" restrictions="" />
+      <ITEM name="wf_repo" value="/lustre_cfc/qbic/workflow_repos" type="string" description="snakemake workflow git repository." required="true" advanced="true" restrictions="" />
+			</NODE>
+		</NODE>
+	</PARAMETERS>
+</tool>
