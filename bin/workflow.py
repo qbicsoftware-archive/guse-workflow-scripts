@@ -12,6 +12,7 @@ def read_firstline(yourfile):
 
 wfdir = read_firstline("wfdir")
 srcdir = read_firstline("srcdir")
+#Two ports in guse are not allowed to have the same file
 with open('wfdir2', 'w') as f:
     f.write(wfdir)
 

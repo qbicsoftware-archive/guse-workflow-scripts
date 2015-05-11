@@ -6,6 +6,8 @@ import sys
 from CTDopts.CTDopts import _InFile, CTDModel, args_from_file
 import json
 
+import qproject
+
 #allocates a workspace on the cluster of the university of tuebingen and returns it path
 #ws_allocate: str str int -> str
 #Note: if duration is not an int it will be tried to convert it into an int
@@ -17,31 +19,6 @@ def ws_allocate(file_system, jobname, duration):
     return wfdirls[-1]
 
 
-#prepares a qproject on the cluster, in the workspace directory with the name jobname in which snakemake workflows can be executed and returns its path
-#qproject_prepare_for_user: str, str, str, str, [], [] -> str
-def qproject_prepare_for_user(workspacedir, jobname, workflow, user, datasets, db):
-#qproject prepare -t qproject_testwf -w workflow_repos/qcprot-dummy --group qbicgrp --data inputFiles/velos005614.mzML inputFiles/velos005615.mzML
-    wfdir = os.path.abspath(os.path.join(workspacedir,jobname))
-    conf = "config.json"
-    if not os.path.isfile(conf):
-        dic = {}
-        with open(conf, 'w') as fp:
-            json.dump(dic, fp)
-    command = ["qproject", "prepare", "--commit", "HEAD","--params", conf,"-t", wfdir, "-w", workflow, "--user", user, "--data"]
-    command.extend(datasets)
-    command.append("--ref")
-    command.extend(db)
-    subprocess.check_call(command, shell=False)
-    return wfdir
-
-#prepares a qproject on the cluster, in the workspace directory with the name jobname in which snakemake workflows can be executed and returns its path
-#qproject_prepare_for_group: str, str, str, str, [] -> str
-def qproject_prepare_for_group(workspacedir, jobname, workflow, group, datasets):
-    wfdir = os.path.abspath(os.path.join(workspacedir,jobname))
-    command = ["qproject", "prepare", "-t", wfdir, "-w", workflow, "--group", group, "--data"]
-    command.extend(datasets)
-    subprocess.check_call(command, shell=False)
-    return wfdir
 
 #cp fasta to the folder ref which was created by qprojects and returns its new path
 #cp_fasta_to_qporjects_ref: str, str -> str
@@ -116,14 +93,14 @@ if __name__ == "__main__":
     #wfdir = ws_allocate("cfc", "init_works_qbic_dw", 1)
     print("allocating work space " + registername)
     wfspace = ws_allocate(filesystem, registername, duration)
-    wfdir = qproject_prepare_for_user(wfspace, jobname, os.path.join(wf_repo, snakemake_wf_name), user, inputfiles, db)
+    wfdir = qproject.create_for_user(wfspace, jobname, os.path.join(wf_repo, snakemake_wf_name), user, inputfiles, db)
     
     #copy_workflow_ctd_to_qproject(sys.argv[6],os.path.join(wfdir, "inis", snakemake_wf_name ))
     print("copying inis to workflow directory")
     #junk paths (-j).  The archive's directory structure is not recreated; all files are deposited in the extraction directory (-d)
-    command = ['unzip','-j', sys.argv[6], "-d", os.path.join(wfdir, "inis", snakemake_wf_name ) ]
+    command = ['unzip','-j', sys.argv[6], "-d", os.path.join(wfdir, "inis") ]
     subprocess.check_call(command, shell=False)
     with open('wfdir', 'w') as f:
         f.write(wfdir)
     with open('srcdir', 'w') as f:
-        f.write(os.path.join(wfdir,"src",snakemake_wf_name))
+        f.write(os.path.join(wfdir,"src"))
