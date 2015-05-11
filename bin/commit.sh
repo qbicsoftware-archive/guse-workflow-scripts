@@ -4,9 +4,14 @@ dropbox=$(cat $3)
 registername=$(cat $1)
 wfdir=$(cat $2)
 wfdir_base=$(basename $wfdir)
-dbdir=$registername"-"$wfdir_base
-copyied=$dropbox"/"$dbdir
+user=$(whoami)
+#dbdir=$registername"-"$wfdir_base
+#copyied=$dropbox"/"$dbdi
+
 echo "copying "$wfdir" to "$dropbox" with name "$copyied 
-cp -r $wfdir $dropobx"/"$copyied
-touch $dropbox"/.MARKER_is_finished_"$dbdir
+
+qproject commit -t $wfdir_base --dropbox $dropbox --barcode $registername --user $user
+
+#cp -r $wfdir $dropobx"/"$copyied
+touch $dropbox"/.MARKER_is_finished_"$registername
 echo "results written to dropbox"
