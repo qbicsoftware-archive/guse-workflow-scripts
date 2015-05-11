@@ -11,7 +11,10 @@ user=$(whoami)
 echo "copying "$wfdir" to "$dropbox" with name "$copyied 
 
 qproject commit -t $wfdir_base --dropbox $dropbox --barcode $registername --user $user
-
-#cp -r $wfdir $dropobx"/"$copyied
-touch $dropbox"/.MARKER_is_finished_"$registername
-echo "results written to dropbox"
+if [ $? = 0  ]; then
+    touch $dropbox"/.MARKER_is_finished_"$registername
+    echo "results written to dropbox"
+else
+    echo "qproject commit failed"
+    return -1
+fi
