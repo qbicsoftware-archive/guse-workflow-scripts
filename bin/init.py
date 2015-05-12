@@ -16,7 +16,7 @@ def ws_allocate(file_system, jobname, duration):
     command = ["ws_allocate", "-F", file_system, jobname, str(duration)]
     output = subprocess.check_output(command, shell=False)
     wfdirls = output.split()
-    return wfdirls[-1]
+    return wfdirls[-1].decode('ascii')
 
 
 
@@ -93,12 +93,13 @@ if __name__ == "__main__":
     #wfdir = ws_allocate("cfc", "init_works_qbic_dw", 1)
     print("allocating work space " + registername)
     wfspace = ws_allocate(filesystem, registername, duration)
+    assert os.path.isdir(wfspace)
     wfdir = qproject.create_for_user(wfspace, jobname, os.path.join(wf_repo, snakemake_wf_name), user, inputfiles, db)
     
     #copy_workflow_ctd_to_qproject(sys.argv[6],os.path.join(wfdir, "inis", snakemake_wf_name ))
     print("copying inis to workflow directory")
     #junk paths (-j).  The archive's directory structure is not recreated; all files are deposited in the extraction directory (-d)
-    command = ['unzip','-j', sys.argv[6], "-d", os.path.join(wfdir, "inis") ]
+    command = ['unzip','-j', sys.argv[6], "-d", os.path.join(wfdir, "etc") ]
     subprocess.check_call(command, shell=False)
     with open('wfdir', 'w') as f:
         f.write(wfdir)

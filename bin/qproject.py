@@ -1,4 +1,6 @@
-
+import subprocess
+import os
+import json
 
 #prepares a qproject on the cluster, in the workspace directory with the name jobname in which snakemake workflows can be executed and returns its path
 #create_for_user: str, str, str, str, [], [] -> str
@@ -7,7 +9,8 @@ def create_for_user(workspacedir, jobname, workflow, user, datasets, db):
     wfdir = os.path.abspath(os.path.join(workspacedir,jobname))
     conf = "config.json"
     if not os.path.isfile(conf):
-        dic = {}
+        db_temp = [os.path.basename(f) for f in db]
+        dic = {'fasta': db_temp}
         with open(conf, 'w') as fp:
             json.dump(dic, fp)
     command = ["qproject", "create", "--commit", "HEAD","--params", conf,"-t", wfdir, "-w", workflow, "--user", user, "--data"]
