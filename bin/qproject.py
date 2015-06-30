@@ -10,6 +10,7 @@ import json
 def create(workspacedir, jobname, workflow, datasets, config=None, user=None, group=None, ref=None):
     wfdir = os.path.abspath(os.path.join(workspacedir,jobname))
     command = ["qproject", "create", "--commit", "HEAD","--params", config ,"-t", wfdir, "-w", workflow]
+    addParam(command,"--data",datasets)
     addParam(command,"--user", user)
     addParam(command,"--group",group)
     addParam(command,"--ref", ref)

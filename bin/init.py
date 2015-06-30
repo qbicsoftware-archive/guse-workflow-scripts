@@ -81,8 +81,9 @@ def init():
     params["duration"] = ctd['duration']
     params['filesystem'] = ctd['filesystem']
 
-    params['_wfname'] = ctd['wfname']
+    params['wfname'] = ctd['wfname']
     params['wfrepo'] = ctd['wf_repo']
+    params['wf']= os.path.join(params['wfrepo'],params['wfname'])
     params['jobname'] = read_firstline(sys.argv[2])
     params['registername'] = read_firstline(sys.argv[3])
     params['user'] = read_firstline(sys.argv[4])
@@ -99,9 +100,9 @@ def init():
     return params
 
 def prep_project(params):
-    if params["wf_name"] == 'rnaseq':
+    if params["wfname"] == 'rnaseq':
         wfdir = prep_rnaseq(params)
-    elif params["wf_name"] == 'qcprot':
+    elif params["wfname"] == 'qcprot':
         wfdir = prep_qcprot(params)
 
     #write those for guse
@@ -111,15 +112,16 @@ def prep_project(params):
         f.write(os.path.join(wfdir,"src"))
 
 
-def prep_rnaseq():
+def prep_rnaseq(params):
     conf = 'config.json'
+    #here it is assumed that the portal prevents empty db
+    db_temp =  params['db'][0]
+    db = db_temp.split(':')
     if not os.path.isfile(conf):
-        db_temp =  params['db']
-        db = db_temp.split(':')
         dic = {'gtf': os.path.basename(db[1]), 'indexedGenome': os.path.basename(db[0]) + "/genome"}
         with open(conf, 'w') as fp:
             json.dump(dic, fp)
-    wfdir = qproject.create(params['wfspace'],params['jobname'],params['input'],conf,params['user'],params['group'],params['db'])
+            wfdir = qproject.create(params['wfspace'],params['jobname'],params['wfname'],params['inputfiles'],conf,params['user'],params['group'])
     #create link to database files
     ln(wfdir+"ref"+os.path.basename(db[1]),db[1])
     ln(wfdir+"ref"+os.path.basename(db[0]),db[0])
