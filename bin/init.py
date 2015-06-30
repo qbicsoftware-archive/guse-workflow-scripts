@@ -5,19 +5,22 @@ import os
 import sys
 from CTDopts.CTDopts import _InFile, CTDModel, args_from_file
 import json
-
 import qproject
 
 #allocates a workspace on the cluster of the university of tuebingen and returns it path
 #ws_allocate: str str int -> str
 #Note: if duration is not an int it will be tried to convert it into an int
 def ws_allocate(file_system, jobname, duration):
-    dur = int(duration)+1
     command = ["ws_allocate", "-F", file_system, jobname, str(duration)]
     output = subprocess.check_output(command, shell=False)
     wfdirls = output.split()
     return wfdirls[-1].decode('ascii')
 
+
+
+def ln(dest, src):
+    command = ['ln','-s', src, dest]
+    return subprocess.check_call(command, shell=False)
 
 
 #cp fasta to the folder ref which was created by qprojects and returns its new path
@@ -49,7 +52,6 @@ def get_filestostage(ctdmodel,parameter):
             else:
                 filestostage.append(p.default)
             break
-            
     return filestostage
 
 #copies the given workflow ctd into the destination folder for all tools
@@ -70,38 +72,74 @@ def get_filestostage(ctdmodel,parameter):
 #    for tool in some_ctd_tools:
 #        command = ["cp", "-f", ctd, os.path.join(destination,tool)]
 #        subprocess.check_call(command, shell=False)
-
-if __name__ == "__main__":
+def init():
     if len(sys.argv) != 7:
         print(''.join(["Usage: ", os.path.basename(__file__), ' params.ctd jobname.txt registername.txt user.txt filestostage.ctd workflow.ctd' ]))
         sys.exit(-1)
+    params = {}
     ctd = args_from_file(sys.argv[1])
-    duration = ctd['duration']
-    filesystem = ctd['filesystem']
-    
-    snakemake_wf_name = ctd['wfname']
-    wf_repo = ctd['wf_repo']
-    
-    jobname = read_firstline(sys.argv[2])
-    registername = read_firstline(sys.argv[3])
-    user = read_firstline(sys.argv[4])
-    
+    params["duration"] = ctd['duration']
+    params['filesystem'] = ctd['filesystem']
+
+    params['_wfname'] = ctd['wfname']
+    params['wfrepo'] = ctd['wf_repo']
+    params['jobname'] = read_firstline(sys.argv[2])
+    params['registername'] = read_firstline(sys.argv[3])
+    params['user'] = read_firstline(sys.argv[4])
+    params['group'] = None
+
     ctdmodel = CTDModel(from_file=sys.argv[5])
-    inputfiles = get_filestostage(ctdmodel,"input")
-    db = get_filestostage(ctdmodel, "db")
-    
+    params['inputfiles'] = get_filestostage(ctdmodel,"input")
+    params['db'] = get_filestostage(ctdmodel, "db")
+
     #wfdir = ws_allocate("cfc", "init_works_qbic_dw", 1)
-    print("allocating work space " + registername)
-    wfspace = ws_allocate(filesystem, registername, duration)
-    assert os.path.isdir(wfspace)
-    wfdir = qproject.create_for_user(wfspace, jobname, os.path.join(wf_repo, snakemake_wf_name), user, inputfiles, db)
-    
-    #copy_workflow_ctd_to_qproject(sys.argv[6],os.path.join(wfdir, "inis", snakemake_wf_name ))
-    print("copying inis to workflow directory")
-    #junk paths (-j).  The archive's directory structure is not recreated; all files are deposited in the extraction directory (-d)
-    command = ['unzip','-j', sys.argv[6], "-d", os.path.join(wfdir, "etc") ]
-    subprocess.check_call(command, shell=False)
+    print("allocating work space " + params['registername'])
+    params['wfspace'] = ws_allocate(params['filesystem'], params['registername'], params['duration'])
+    params['params'] = sys.argv[6]
+    return params
+
+def prep_project(params):
+    if params["wf_name"] == 'rnaseq':
+        wfdir = prep_rnaseq(params)
+    elif params["wf_name"] == 'qcprot':
+        wfdir = prep_qcprot(params)
+
+    #write those for guse
     with open('wfdir', 'w') as f:
         f.write(wfdir)
     with open('srcdir', 'w') as f:
         f.write(os.path.join(wfdir,"src"))
+
+
+def prep_rnaseq():
+    conf = 'config.json'
+    if not os.path.isfile(conf):
+        db_temp =  params['db']
+        db = db_temp.split(':')
+        dic = {'gtf': os.path.basename(db[1]), 'indexedGenome': os.path.basename(db[0]) + "/genome"}
+        with open(conf, 'w') as fp:
+            json.dump(dic, fp)
+    wfdir = qproject.create(params['wfspace'],params['jobname'],params['input'],conf,params['user'],params['group'],params['db'])
+    #create link to database files
+    ln(wfdir+"ref"+os.path.basename(db[1]),db[1])
+    ln(wfdir+"ref"+os.path.basename(db[0]),db[0])
+
+def prep_qcprot(params):
+    conf = 'config.json'
+    if not os.path.isfile(conf):
+        db_temp = [os.path.basename(f) for f in params['db']]
+        dic = {'fasta': db_temp}
+        with open(conf, 'w') as fp:
+            json.dump(dic,fp)
+    wfdir =  qproject.create(params['wfspace'],params['jobname'],params['input'],conf,params['user'],params['group'],params['db'])
+
+    print("copying inis to workflow directory")
+    #junk paths (-j).  The archive's directory structure is not recreated; all files are deposited in the extraction directory (-d)
+    command = ['unzip','-j', params['params'], "-d", os.path.join(wfdir, "etc") ]
+    subprocess.check_call(command, shell=False)
+    return wfdir
+
+if __name__ == "__main__":
+    params = init()
+    assert os.path.isdir(params['wfspace'])
+    prep_project(params)

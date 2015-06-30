@@ -2,9 +2,34 @@ import subprocess
 import os
 import json
 
+
+
+
+#executes qpoject.in order to create a working directory for qbics snakemake workflows
+#either user or group has to be set. If both are non a ValueError will be raised
+def create(workspacedir, jobname, workflow, datasets, config=None, user=None, group=None, ref=None):
+    wfdir = os.path.abspath(os.path.join(workspacedir,jobname))
+    command = ["qproject", "create", "--commit", "HEAD","--params", config ,"-t", wfdir, "-w", workflow]
+    addParam(command,"--user", user)
+    addParam(command,"--group",group)
+    addParam(command,"--ref", ref)
+    subprocess.check_call(command,shell=False)
+    return wfdir
+
+
+def addParam(command, key, value):
+    if value is not None:
+        if isinstance(value,list):
+            command.append(key)
+            command.extend(value)
+        else:
+            command.extend([key, value])
+
 #prepares a qproject on the cluster, in the workspace directory with the name jobname in which snakemake workflows can be executed and returns its path
 #create_for_user: str, str, str, str, [], [] -> str
+#deprecated
 def create_for_user(workspacedir, jobname, workflow, user, datasets, db):
+
 #qproject prepare -t qproject_testwf -w workflow_repos/qcprot-dummy --group qbicgrp --data inputFiles/velos005614.mzML inputFiles/velos005615.mzML
     wfdir = os.path.abspath(os.path.join(workspacedir,jobname))
     conf = "config.json"
@@ -22,6 +47,7 @@ def create_for_user(workspacedir, jobname, workflow, user, datasets, db):
 
 #prepares a qproject on the cluster, in the workspace directory with the name jobname in which snakemake workflows can be executed and returns its path
 #create_for_group: str, str, str, str, [] -> str
+#deprecated
 def create_for_group(workspacedir, jobname, workflow, group, datasets):
     wfdir = os.path.abspath(os.path.join(workspacedir,jobname))
     command = ["qproject", "create", "-t", wfdir, "-w", workflow, "--group", group, "--data"]
