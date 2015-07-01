@@ -121,10 +121,12 @@ def prep_rnaseq(params):
         dic = {'gtf': os.path.basename(db[1]), 'indexedGenome': os.path.basename(db[0]) + "/genome"}
         with open(conf, 'w') as fp:
             json.dump(dic, fp)
-            wfdir = qproject.create(params['wfspace'],params['jobname'],params['wfname'],params['inputfiles'],conf,params['user'],params['group'])
+    wfdir = qproject.create(params['wfspace'],params['jobname'],params['wf'],params['inputfiles'],conf,params['user'],params['group'])
     #create link to database files
-    ln(wfdir+"ref"+os.path.basename(db[1]),db[1])
-    ln(wfdir+"ref"+os.path.basename(db[0]),db[0])
+    ref = os.path.join(wfdir,"ref")
+    ln(os.path.join(ref,os.path.basename(db[1])),db[1])
+    ln(os.path.join(ref,os.path.basename(db[0])),db[0])
+    return wfdir
 
 def prep_qcprot(params):
     conf = 'config.json'
@@ -133,7 +135,7 @@ def prep_qcprot(params):
         dic = {'fasta': db_temp}
         with open(conf, 'w') as fp:
             json.dump(dic,fp)
-    wfdir =  qproject.create(params['wfspace'],params['jobname'],params['input'],conf,params['user'],params['group'],params['db'])
+    wfdir =  qproject.create(params['wfspace'],params['jobname'],params['wf'],params['inputfiles'],conf,params['user'],params['group'],params['db'])
 
     print("copying inis to workflow directory")
     #junk paths (-j).  The archive's directory structure is not recreated; all files are deposited in the extraction directory (-d)
