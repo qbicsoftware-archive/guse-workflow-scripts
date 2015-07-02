@@ -1,4 +1,9 @@
 #!/bin/bash
 module load qbic/anaconda
 
-python workflow.py
+run=$(cat srcdir)
+echo "executing "$run"/run"
+cd $run
+eval ./run
+cd -
+cp wfdir wfdir2
