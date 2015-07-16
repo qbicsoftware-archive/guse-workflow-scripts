@@ -13,5 +13,5 @@ if [ $? = 0  ]; then
     echo "results written to dropbox"
 else
     echo "qproject commit failed"
-    return -1
+    exit 255
 fi
