@@ -104,12 +104,19 @@ def prep_project(params):
         wfdir = prep_rnaseq(params)
     elif params["wfname"] == 'qcprot':
         wfdir = prep_qcprot(params)
-
+    elif params['wfname'] == 'maxquant':
+        wfdir = prep_maxquant(params)
     #write those for guse
     with open('wfdir', 'w') as f:
         f.write(wfdir)
     with open('srcdir', 'w') as f:
         f.write(os.path.join(wfdir,"src"))
+
+
+def prep_maxquant(params):
+    conf = params['params']
+    wfdir = qproject.create(params['wfspace'],params['jobname'],params['wf'],params['inputfiles'],conf,params['user'],params['group'],params['ref'])
+    return wfdir
 
 
 def prep_rnaseq(params):
