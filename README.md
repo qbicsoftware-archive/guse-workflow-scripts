@@ -38,4 +38,3 @@ This node might be a simple script, an executable or a different workflow
 This one in (our case) commits results and logfiles to the database. From there
 results and logs can be seen and used by our users.
 
-
