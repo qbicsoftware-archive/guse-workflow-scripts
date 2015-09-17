@@ -2,7 +2,7 @@
 
 These scripts are used in [guse-workflow-repository](https://github.com/qbicsoftware/guse-workflow-repo).
 They can be used to ease the use of e.g.
-[snakemake](https://bitbucket.org/johanneskoester/snakemake/wiki/Home) workflows with guse.
+[snakemake](https://bitbucket.org/johanneskoester/snakemake/wiki/Home) workflows with [guse](http://www.guse.hu/).
 
 an alternative is [applicake](https://pypi.python.org/pypi/applicake) which was designed for a similar purpose. Be
 aware however, that applicake is far more complex and maybe over-engineered for
