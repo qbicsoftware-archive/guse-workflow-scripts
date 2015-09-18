@@ -4,15 +4,17 @@ These scripts are used in [guse-workflow-repository](https://github.com/qbicsoft
 They can be used to ease the use of e.g.
 [snakemake](https://bitbucket.org/johanneskoester/snakemake/wiki/Home) workflows with [guse](http://www.guse.hu/).
 
-an alternative is [applicake](https://pypi.python.org/pypi/applicake) which was designed for a similar purpose. Be
-aware however, that applicake is far more complex and maybe over-engineered for
+An alternative is [applicake](https://pypi.python.org/pypi/applicake) which was designed for a similar purpose. Be
+aware however, that applicake is far more complex and may be over-engineered for
 most tasks.
 
-/bin folder contains all scripts.
+**/bin** folder contains all scripts.
 
-/input folder contains dummy input files, to see how those might look like.
-[CTDopts](https://github.com/qbicsoftware/CTDopts)  used for handling command line parameters of different tools.
-/build contains a snakemake file that is not ready to use. But one can look
+**/input** folder contains dummy input files, to see how input files might might look like.
+[CTDopts](https://github.com/qbicsoftware/CTDopts) is mainly used for handling command line parameters.
+
+
+**/build** contains a snakemake file that is not ready to use. But one can look
 inside to see what has to be done if you have more than one file that you want
 to execute as a guse node.
 But basically if you have init.sh, init.py, qproject.py and want to have all of
